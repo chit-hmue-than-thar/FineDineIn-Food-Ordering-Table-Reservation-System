@@ -29,9 +29,11 @@ namespace FoodOrdering.CustomerWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime? date = null, string? timeSlot = null, int partySize = 2, TableLocationType? location = null)
+        public async Task<IActionResult> Index(DateTime? date = null, string? timeSlot = null, int partySize = 2, TableLocationType? location = null, bool completed = false)
         {
             var userId = GetCurrentUserId();
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
             var targetDate = date?.Date ?? DateTime.Today;
             var slot = string.IsNullOrWhiteSpace(timeSlot) ? "18:00 - 20:00" : timeSlot.Trim();
 
@@ -66,14 +68,18 @@ namespace FoodOrdering.CustomerWeb.Controllers
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
-            var viewModel = new SeatMapViewModel
+            var viewModel = new ReservationWizardViewModel
             {
+                FullName = currentUser?.Name ?? "",
+                EmailAddress = currentUser?.Email ?? "",
+                PhoneNumber = currentUser?.Phone ?? "",
                 SelectedDate = targetDate,
                 SelectedTimeSlot = slot,
                 PartySize = partySize,
                 LocationFilter = location,
                 Tables = tableSeats,
-                CustomerReservations = myReservations
+                CustomerReservations = myReservations,
+                IsSuccess = completed
             };
 
             return View(viewModel);
@@ -81,13 +87,48 @@ namespace FoodOrdering.CustomerWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(Guid tableId, DateTime reservationDate, string timeSlot, int partySize, string? specialRequests)
+        public async Task<IActionResult> Book(
+            string fullName, 
+            string emailAddress, 
+            string phoneNumber,
+            Guid tableId, 
+            DateTime reservationDate, 
+            string timeSlot, 
+            int partySize, 
+            string? selectedBank,
+            Microsoft.AspNetCore.Http.IFormFile? paymentScreenshot,
+            string? specialRequests)
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty) return RedirectToAction("Login", "Auth");
 
-            var slot = timeSlot.Trim();
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(emailAddress) || string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                TempData["ErrorMessage"] = "Please fill in all mandatory contact details (Full Name, Email Address, and Phone Number).";
+                return RedirectToAction("Index", new { date = reservationDate, timeSlot, partySize });
+            }
+
+            var slot = string.IsNullOrWhiteSpace(timeSlot) ? "18:00 - 20:00" : timeSlot.Trim();
             var targetDate = reservationDate.Date;
+
+            // Handle screenshot upload
+            string? screenshotUrl = null;
+            if (paymentScreenshot != null && paymentScreenshot.Length > 0)
+            {
+                var uploadsFolder = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "uploads", "payments");
+                if (!System.IO.Directory.Exists(uploadsFolder))
+                {
+                    System.IO.Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = $"RES_{targetDate:yyyyMMdd}_{Guid.NewGuid().ToString().Substring(0, 8)}{System.IO.Path.GetExtension(paymentScreenshot.FileName)}";
+                var filePath = System.IO.Path.Combine(uploadsFolder, fileName);
+                using (var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+                {
+                    await paymentScreenshot.CopyToAsync(stream);
+                }
+                screenshotUrl = $"/uploads/payments/{fileName}";
+            }
 
             // Double-booking protection with DB Transaction
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -113,7 +154,7 @@ namespace FoodOrdering.CustomerWeb.Controllers
                     TimeSlot = slot,
                     PartySize = partySize,
                     Status = ReservationStatus.Confirmed,
-                    SpecialRequests = specialRequests ?? "",
+                    SpecialRequests = $"[Contact: {fullName} | {phoneNumber} | {emailAddress}] [Bank: {selectedBank ?? "KBZPay"}] {specialRequests ?? ""}",
                     CreatedAt = mmTime
                 };
 
@@ -124,8 +165,8 @@ namespace FoodOrdering.CustomerWeb.Controllers
                     Id = Guid.NewGuid(),
                     UserId = userId,
                     Type = NotificationType.ReservationUpdate,
-                    Title = "Table Reserved!",
-                    Message = $"Your table reservation for {targetDate:MMM dd, yyyy} ({slot}) has been confirmed.",
+                    Title = "Table Reserved Successfully!",
+                    Message = $"Your table reservation for {targetDate:MMM dd, yyyy} ({slot}) has been confirmed. Payment receipt received.",
                     CreatedAt = mmTime
                 };
                 await _context.Notifications.AddAsync(notification);
@@ -133,8 +174,10 @@ namespace FoodOrdering.CustomerWeb.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["SuccessMessage"] = "Table reservation confirmed successfully!";
-                return RedirectToAction("MyReservations");
+                TempData["SuccessMessage"] = "Table reservation & payment receipt submitted successfully!";
+                TempData["WizardCompleted"] = "true";
+                TempData["VoucherNo"] = $"VCH-RES-{targetDate:yyyyMMdd}-{new Random().Next(1000, 9999)}";
+                return RedirectToAction("Index", new { date = targetDate, timeSlot = slot, partySize, completed = true });
             }
             catch (Exception ex)
             {

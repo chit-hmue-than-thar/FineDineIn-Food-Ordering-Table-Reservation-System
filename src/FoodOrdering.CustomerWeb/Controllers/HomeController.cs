@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FoodOrdering.Database;
+using FoodOrdering.Domain.Entities;
 using FoodOrdering.CustomerWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -62,24 +64,24 @@ namespace FoodOrdering.CustomerWeb.Controllers
                 ? await _context.FoodItems.Include(i => i.Category).FirstOrDefaultAsync(i => i.Id == id.Value)
                 : foodItems.FirstOrDefault() ?? await _context.FoodItems.Include(i => i.Category).FirstOrDefaultAsync();
 
+            // Fallback if specific category has no items
             if (activeItem == null)
             {
-                return NotFound("No food items found.");
+                activeItem = await _context.FoodItems.Include(i => i.Category).FirstOrDefaultAsync();
             }
 
-            var recommended = await _context.FoodItems
-                .Where(i => i.Id != activeItem.Id)
-                .Take(4)
-                .ToListAsync();
+            var recommended = activeItem != null
+                ? await _context.FoodItems.Where(i => i.Id != activeItem.Id).Take(4).ToListAsync()
+                : new List<TblFoodItem>();
 
-            var ingredients = (activeItem.MainIngredients ?? "")
+            var ingredients = (activeItem?.MainIngredients ?? "")
                 .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
                 .ToList();
 
             var viewModel = new FoodDetailViewModel
             {
-                FoodItem = activeItem,
+                FoodItem = activeItem ?? new TblFoodItem { Title = "Menu Item", Description = "Explore our fine dining dishes", Price = 0 },
                 Categories = categories,
                 RecommendedItems = recommended,
                 ParsedIngredients = ingredients,

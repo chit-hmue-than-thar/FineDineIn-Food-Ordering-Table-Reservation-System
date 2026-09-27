@@ -71,42 +71,29 @@ namespace FoodOrdering.CustomerWeb.Controllers
         {
             var activeItem = await _context.FoodItems
                 .Include(i => i.Category)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
-            if (activeItem == null)
-            {
-                return NotFound("Dish not found.");
-            }
+                .FirstOrDefaultAsync(i => i.Id == id)
+                ?? await _context.FoodItems.Include(i => i.Category).FirstOrDefaultAsync();
 
             var categories = await _context.FoodCategories
                 .OrderBy(c => c.DisplayOrder)
                 .ToListAsync();
 
-            var recommended = await _context.FoodItems
-                .Where(i => i.Id != activeItem.Id && i.CategoryId == activeItem.CategoryId)
-                .Take(4)
-                .ToListAsync();
+            var recommended = activeItem != null
+                ? await _context.FoodItems.Where(i => i.Id != activeItem.Id).Take(4).ToListAsync()
+                : new List<TblFoodItem>();
 
-            if (!recommended.Any())
-            {
-                recommended = await _context.FoodItems
-                    .Where(i => i.Id != activeItem.Id)
-                    .Take(4)
-                    .ToListAsync();
-            }
-
-            var ingredients = (activeItem.MainIngredients ?? "")
+            var ingredients = (activeItem?.MainIngredients ?? "")
                 .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
                 .ToList();
 
             var viewModel = new FoodDetailViewModel
             {
-                FoodItem = activeItem,
+                FoodItem = activeItem ?? new TblFoodItem { Title = "Menu Item", Description = "Explore our fine dining dishes", Price = 0 },
                 Categories = categories,
                 RecommendedItems = recommended,
                 ParsedIngredients = ingredients,
-                SelectedCategoryName = activeItem.Category?.Name ?? "All"
+                SelectedCategoryName = activeItem?.Category?.Name ?? "All"
             };
 
             return View("Index", viewModel);
