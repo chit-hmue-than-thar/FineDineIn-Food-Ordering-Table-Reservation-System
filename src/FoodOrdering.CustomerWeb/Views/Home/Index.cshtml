@@ -159,7 +159,7 @@
                                         <i class="bi bi-star-fill text-warning"></i>
                                         <span class="ms-1 text-muted">(@dish.Rating.ToString("F1"))</span>
                                     </div>
-                                    <span class="product-price fw-bold text-dark">$@dish.Price.ToString("F2")</span>
+                                    <span class="product-price fw-bold text-dark">@dish.Price.ToString("N0") MMK</span>
                                 </div>
 
                                 <!-- Add to Cart Form Button -->
@@ -181,14 +181,14 @@
                 <!-- Fallback 8 Fine Dining Cuisine & Products -->
                 var defaultItems = new[]
                 {
-                    new { Title = "Grilled Salmon", Desc = "Served with lemon butter sauce", Price = 24.99, Rating = 4.8, Img = "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500" },
-                    new { Title = "Creamy Prawn Pasta", Desc = "Penne in creamy garlic sauce with fresh herbs", Price = 21.99, Rating = 4.7, Img = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500" },
-                    new { Title = "Ribeye Steak", Desc = "Grilled to perfection with herb butter", Price = 29.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1544025162-d76694265947?w=500" },
-                    new { Title = "Classic Tiramisu", Desc = "With cocoa & mascarpone cream", Price = 8.99, Rating = 4.6, Img = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500" },
-                    new { Title = "Truffle Mushroom Risotto", Desc = "Creamy arborio rice with black truffle", Price = 18.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=500" },
-                    new { Title = "Margherita Pizza", Desc = "Fresh basil & mozzarella on sourdough", Price = 16.99, Rating = 4.7, Img = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" },
-                    new { Title = "Mango Passion Mocktail", Desc = "Tropical refreshing artisan drink", Price = 7.99, Rating = 4.8, Img = "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500" },
-                    new { Title = "Chocolate Lava Cake", Desc = "Served warm with vanilla bean ice cream", Price = 9.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500" }
+                    new { Title = "Grilled Salmon", Desc = "Served with lemon butter sauce", Price = 45000.0, Rating = 4.8, Img = "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500" },
+                    new { Title = "Creamy Prawn Pasta", Desc = "Penne in creamy garlic sauce with fresh herbs", Price = 38000.0, Rating = 4.7, Img = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500" },
+                    new { Title = "Ribeye Steak", Desc = "Grilled to perfection with herb butter", Price = 55000.0, Rating = 4.9, Img = "https://images.unsplash.com/photo-1544025162-d76694265947?w=500" },
+                    new { Title = "Classic Tiramisu", Desc = "With cocoa & mascarpone cream", Price = 15000.0, Rating = 4.6, Img = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500" },
+                    new { Title = "Truffle Mushroom Risotto", Desc = "Creamy arborio rice with black truffle", Price = 32000.0, Rating = 4.9, Img = "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=500" },
+                    new { Title = "Margherita Pizza", Desc = "Fresh basil & mozzarella on sourdough", Price = 28000.0, Rating = 4.7, Img = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" },
+                    new { Title = "Mango Passion Mocktail", Desc = "Tropical refreshing artisan drink", Price = 12000.0, Rating = 4.8, Img = "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500" },
+                    new { Title = "Chocolate Lava Cake", Desc = "Served warm with vanilla bean ice cream", Price = 18000.0, Rating = 4.9, Img = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500" }
                 };
 
                 var idx = 0;
@@ -224,7 +224,7 @@
                                         <i class="bi bi-star-fill text-warning"></i>
                                         <span class="ms-1 text-muted">(@item.Rating.ToString("F1"))</span>
                                     </div>
-                                    <span class="product-price fw-bold text-dark">$@item.Price.ToString("F2")</span>
+                                    <span class="product-price fw-bold text-dark">@item.Price.ToString("N0") MMK</span>
                                 </div>
 
                                 <form asp-controller="Cart" asp-action="Add" method="post">

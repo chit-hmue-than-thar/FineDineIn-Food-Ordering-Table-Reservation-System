@@ -52,9 +52,9 @@
                         <div class="mb-4">
                             <label class="form-label text-dark small fw-bold mb-2">Size / Portion</label>
                             <div class="d-flex gap-2">
-                                <button type="button" class="size-pill-option active" onclick="selectSize(this)">Standard (500g)</button>
-                                <button type="button" class="size-pill-option" onclick="selectSize(this)">Half (350g)</button>
-                                <button type="button" class="size-pill-option" onclick="selectSize(this)">Chef Tasting (750g)</button>
+                                <button type="button" class="size-pill-option active" data-portion="Standard (500g)" data-mult="1.0" onclick="selectSize(this)">Standard (500g)</button>
+                                <button type="button" class="size-pill-option" data-portion="Half (350g)" data-mult="0.7" onclick="selectSize(this)">Half (350g)</button>
+                                <button type="button" class="size-pill-option" data-portion="Chef Tasting (750g)" data-mult="1.4" onclick="selectSize(this)">Chef Tasting (750g)</button>
                             </div>
                         </div>
 
@@ -94,9 +94,9 @@
                         <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light">
                             <div>
                                 <span class="text-muted small d-block">Total Amount</span>
-                                <span class="fs-3 fw-bold text-dark" id="mainPrice">$@Model.FoodItem.Price.ToString("F2")</span>
+                                <span class="fs-3 fw-bold text-dark" id="mainPrice" data-baseprice="@Model.FoodItem.Price">@Model.FoodItem.Price.ToString("N0") MMK</span>
                             </div>
-                            <button type="button" class="btn btn-gold px-4 py-2" onclick="addToOrderSidebar('@Model.FoodItem.Title', '@Model.FoodItem.ImageUrl', @Model.FoodItem.Price, '@Model.FoodItem.Id')">
+                            <button type="button" class="btn btn-gold px-4 py-2" onclick="addToOrderSidebar('@Model.FoodItem.Title', '@Model.FoodItem.ImageUrl', '@Model.FoodItem.Id')">
                                 <i class="bi bi-bag-plus me-2"></i> Add to cart
                             </button>
                         </div>
@@ -122,7 +122,7 @@
                                     <button class="btn btn-sm text-muted p-0" title="Wishlist"><i class="bi bi-heart"></i></button>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-light">
-                                    <span class="fw-bold text-dark">$@rec.Price.ToString("F2")</span>
+                                    <span class="fw-bold text-dark">@rec.Price.ToString("N0") MMK</span>
                                     <a asp-controller="Catalog" asp-action="Detail" asp-route-id="@rec.Id" class="btn btn-sm btn-gold p-1 px-2">
                                         <i class="bi bi-plus-lg"></i>
                                     </a>
@@ -145,14 +145,14 @@
 
                 <!-- Order Items List Container -->
                 <div id="cartItemsList">
-                    <!-- Item 1: Grilled Salmon / Current Food -->
+                    <!-- Item 1: Current Active Dish -->
                     <div class="order-item-card d-flex align-items-center justify-content-between" id="cartItem-1">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="@Model.FoodItem.ImageUrl" class="order-item-card-img order-item-img" alt="Item" />
+                            <img src="@Model.FoodItem.ImageUrl" class="order-item-card-img order-item-img" alt="@Model.FoodItem.Title" />
                             <div>
                                 <h6 class="fw-bold text-dark mb-0 fs-6">@Model.FoodItem.Title</h6>
-                                <span class="text-muted small d-block">Standard Portion</span>
-                                <span class="fw-bold text-dark small">$@Model.FoodItem.Price.ToString("F2")</span>
+                                <span class="text-muted small d-block item-portion-label">Standard Portion</span>
+                                <span class="fw-bold text-dark small item-unit-price" data-price="@Model.FoodItem.Price">@Model.FoodItem.Price.ToString("N0") MMK</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -170,31 +170,36 @@
                 <div class="p-3 bg-light rounded-3 my-3 border border-light d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-percent text-warning fs-5"></i>
-                        <span class="small fw-semibold text-dark">Discount Promo</span>
+                        <span class="small fw-semibold text-dark">Discount Promo (10% OFF)</span>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-dark-gold py-1 px-2" style="font-size: 0.72rem;">Change Promo</button>
+                    <button type="button" class="btn btn-sm btn-outline-dark-gold py-1 px-2" style="font-size: 0.72rem;" onclick="togglePromo()">APPLIED</button>
                 </div>
 
                 <!-- Financial Summary -->
                 <div class="py-2 border-top border-light mb-3">
                     <div class="d-flex justify-content-between text-muted small mb-2">
                         <span>Total Product Price</span>
-                        <span class="fw-bold text-dark" id="subtotalPrice">$@Model.FoodItem.Price.ToString("F2")</span>
+                        <span class="fw-bold text-dark" id="subtotalPrice">@Model.FoodItem.Price.ToString("N0") MMK</span>
                     </div>
                     <div class="d-flex justify-content-between text-muted small mb-2">
                         <span>Discount (10% Promo)</span>
-                        <span class="fw-bold text-danger" id="discountPrice">-$@((Model.FoodItem.Price * 0.10m).ToString("F2"))</span>
+                        <span class="fw-bold text-danger" id="discountPrice">-@((Model.FoodItem.Price * 0.10m).ToString("N0")) MMK</span>
                     </div>
                     <div class="d-flex justify-content-between text-dark fw-bold fs-5 pt-2 border-top border-light">
                         <span>Total Payment</span>
-                        <span id="finalPaymentPrice">$@((Model.FoodItem.Price * 0.90m).ToString("F2"))</span>
+                        <span id="finalPaymentPrice">@((Model.FoodItem.Price * 0.90m).ToString("N0")) MMK</span>
                     </div>
                 </div>
 
                 <!-- Proceed to Order CTA Button -->
-                <a href="#place-order" class="btn-proceed-order text-center text-decoration-none d-block">
-                    Proceed to Order <i class="bi bi-arrow-right ms-2"></i>
-                </a>
+                <form asp-controller="Cart" asp-action="Add" method="post" id="proceedOrderForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="foodItemId" value="@Model.FoodItem.Id" />
+                    <input type="hidden" name="quantity" id="proceedQty" value="1" />
+                    <button type="submit" class="btn-proceed-order text-center text-decoration-none d-block w-100 border-0">
+                        Proceed to Order <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -203,9 +208,25 @@
 
 @section Scripts {
     <script>
+        var currentMultiplier = 1.0;
+        var currentPortionLabel = "Standard Portion";
+
+        function formatMMK(amount) {
+            return Math.round(amount).toLocaleString('en-US') + ' MMK';
+        }
+
         function selectSize(btn) {
             document.querySelectorAll('.size-pill-option').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+
+            currentMultiplier = parseFloat(btn.getAttribute('data-mult')) || 1.0;
+            currentPortionLabel = btn.getAttribute('data-portion') || "Standard Portion";
+
+            var priceElem = document.getElementById('mainPrice');
+            var basePrice = parseFloat(priceElem.getAttribute('data-baseprice')) || 0;
+            var calcPrice = basePrice * currentMultiplier;
+
+            priceElem.innerText = formatMMK(calcPrice);
         }
 
         function updateQty(btn, change) {
@@ -214,6 +235,10 @@
             var newQty = currentQty + change;
             if (newQty < 1) return;
             qtySpan.innerText = newQty;
+            
+            var proceedQtyInput = document.getElementById('proceedQty');
+            if (proceedQtyInput) proceedQtyInput.value = newQty;
+
             recalculateTotals();
         }
 
@@ -226,20 +251,30 @@
         }
 
         function clearCart() {
-            document.getElementById('cartItemsList').innerHTML = '<p class="text-muted small text-center py-3">No items in your order.</p>';
+            document.getElementById('cartItemsList').innerHTML = '<p class="text-muted small text-center py-4">Your order is empty.</p>';
             recalculateTotals();
         }
 
-        function addToOrderSidebar(title, img, price, id) {
+        function addToOrderSidebar(title, img, id) {
             var list = document.getElementById('cartItemsList');
+            
+            // Remove "Your order is empty" notice if present
+            if (list.querySelector('.text-muted.text-center')) {
+                list.innerHTML = '';
+            }
+
+            var priceElem = document.getElementById('mainPrice');
+            var basePrice = parseFloat(priceElem.getAttribute('data-baseprice')) || 0;
+            var itemPrice = basePrice * currentMultiplier;
+
             var newItemHtml = `
                 <div class="order-item-card d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-3">
-                        <img src="${img}" class="order-item-img" alt="Item" />
+                        <img src="${img}" class="order-item-card-img order-item-img" alt="${title}" />
                         <div>
                             <h6 class="fw-bold text-dark mb-0 fs-6">${title}</h6>
-                            <span class="text-muted small d-block">Standard Portion</span>
-                            <span class="fw-bold text-dark small">$${price.toFixed(2)}</span>
+                            <span class="text-muted small d-block item-portion-label">${currentPortionLabel}</span>
+                            <span class="fw-bold text-dark small item-unit-price" data-price="${itemPrice}">${formatMMK(itemPrice)}</span>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -258,18 +293,31 @@
         function recalculateTotals() {
             var items = document.querySelectorAll('.order-item-card');
             var subtotal = 0;
+            
             items.forEach(function(item) {
-                var priceText = item.querySelector('.fw-bold.text-dark.small').innerText.replace('$', '');
+                var priceElem = item.querySelector('.item-unit-price');
+                var priceVal = 0;
+                if (priceElem) {
+                    priceVal = parseFloat(priceElem.getAttribute('data-price')) || parseFloat(priceElem.innerText.replace(/[^0-9.]/g, '')) || 0;
+                }
                 var qty = parseInt(item.querySelector('.qty-val').innerText) || 1;
-                subtotal += parseFloat(priceText) * qty;
+                subtotal += priceVal * qty;
             });
 
             var discount = subtotal * 0.10;
             var total = subtotal - discount;
 
-            document.getElementById('subtotalPrice').innerText = '$' + subtotal.toFixed(2);
-            document.getElementById('discountPrice').innerText = '-$' + discount.toFixed(2);
-            document.getElementById('finalPaymentPrice').innerText = '$' + total.toFixed(2);
+            var subElem = document.getElementById('subtotalPrice');
+            var discElem = document.getElementById('discountPrice');
+            var finalElem = document.getElementById('finalPaymentPrice');
+
+            if (subElem) subElem.innerText = formatMMK(subtotal);
+            if (discElem) discElem.innerText = '-' + formatMMK(discount);
+            if (finalElem) finalElem.innerText = formatMMK(total);
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            recalculateTotals();
+        });
     </script>
 }

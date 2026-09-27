@@ -77,56 +77,56 @@ namespace FoodOrdering.Database
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = mainCategory.Id, Title = "Grilled Salmon",
-                        Description = "Served with lemon butter sauce", Price = 24.99m,
+                        Description = "Served with lemon butter sauce", Price = 45000m,
                         EstimatedPrepTimeMinutes = 20, Rating = 4.8, MainIngredients = "Fresh Salmon, Lemon, Butter, Parsley",
                         ImageUrl = "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = mainCategory.Id, Title = "Creamy Prawn Pasta",
-                        Description = "Penne in creamy garlic sauce with fresh herbs", Price = 21.99m,
+                        Description = "Penne in creamy garlic sauce with fresh herbs", Price = 38000m,
                         EstimatedPrepTimeMinutes = 18, Rating = 4.7, MainIngredients = "Tiger Prawns, Penne, Garlic, Cream, Tomato, Cheese",
                         ImageUrl = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = mainCategory.Id, Title = "Ribeye Steak",
-                        Description = "Grilled to perfection", Price = 29.99m,
+                        Description = "Grilled to perfection", Price = 55000m,
                         EstimatedPrepTimeMinutes = 25, Rating = 4.9, MainIngredients = "Prime Beef, Rosemary, Herb Butter",
                         ImageUrl = "https://images.unsplash.com/photo-1544025162-d76694265947?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = dessertCategory.Id, Title = "Classic Tiramisu",
-                        Description = "With cocoa & mascarpone", Price = 8.99m,
+                        Description = "With cocoa & mascarpone", Price = 15000m,
                         EstimatedPrepTimeMinutes = 10, Rating = 4.6, MainIngredients = "Espresso, Mascarpone, Cocoa",
                         ImageUrl = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = mainCategory.Id, Title = "Truffle Mushroom Risotto",
-                        Description = "Creamy arborio rice", Price = 18.99m,
+                        Description = "Creamy arborio rice", Price = 32000m,
                         EstimatedPrepTimeMinutes = 20, Rating = 4.9, MainIngredients = "Black Truffle, Arborio Rice, Parmesan",
                         ImageUrl = "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = pizzaCategory.Id, Title = "Margherita Pizza",
-                        Description = "Fresh basil & mozzarella", Price = 16.99m,
+                        Description = "Fresh basil & mozzarella", Price = 28000m,
                         EstimatedPrepTimeMinutes = 15, Rating = 4.7, MainIngredients = "Fresh Mozzarella, Basil, Tomato",
                         ImageUrl = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = beverageCategory.Id, Title = "Mango Passion Mocktail",
-                        Description = "Tropical refreshing drink", Price = 7.99m,
+                        Description = "Tropical refreshing drink", Price = 12000m,
                         EstimatedPrepTimeMinutes = 5, Rating = 4.8, MainIngredients = "Mango Puree, Passionfruit, Mint",
                         ImageUrl = "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500", CreatedAt = now
                     },
                     new TblFoodItem
                     {
                         Id = Guid.NewGuid(), CategoryId = dessertCategory.Id, Title = "Chocolate Lava Cake",
-                        Description = "Served with vanilla ice cream", Price = 9.99m,
+                        Description = "Served with vanilla ice cream", Price = 18000m,
                         EstimatedPrepTimeMinutes = 15, Rating = 4.9, MainIngredients = "Dark Chocolate, Vanilla Bean",
                         ImageUrl = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500", CreatedAt = now
                     }
