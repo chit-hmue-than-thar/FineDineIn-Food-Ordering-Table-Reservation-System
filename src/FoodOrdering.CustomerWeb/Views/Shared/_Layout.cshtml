@@ -52,9 +52,6 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">HOME</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Catalog" asp-action="Index">MENU & DISHES</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index" asp-route-fragment="about-us">ABOUT</a>
                         </li>
                     </ul>
@@ -70,18 +67,8 @@
 
                     <!-- Right Nav Links & Search/User/Cart Icons -->
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1 align-items-center">
-                        <li class="nav-item">
+                        <li class="nav-item me-lg-3">
                             <a class="nav-link" asp-controller="Reservation" asp-action="Index">RESERVATION</a>
-                        </li>
-                        <li class="nav-item dropdown me-lg-3">
-                            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                PAGES
-                            </a>
-                            <ul class="dropdown-menu border-0 shadow-lg" aria-labelledby="pagesDropdown">
-                                <li><a class="dropdown-item" asp-controller="Catalog" asp-action="Index">View All Dishes</a></li>
-                                <li><a class="dropdown-item" asp-controller="Reservation" asp-action="Index">Reserve a Table</a></li>
-                                <li><a class="dropdown-item" asp-controller="Cart" asp-action="Index">Shopping Cart</a></li>
-                            </ul>
                         </li>
 
                         <!-- Icons Section (Search, Profile, Cart) -->
@@ -101,7 +88,7 @@
                                         <li><a class="dropdown-item" asp-controller="Reservation" asp-action="MyReservations"><i class="bi bi-calendar-check me-2"></i> My Reservations</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to log out?');">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>
                                             </form>

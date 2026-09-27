@@ -4,67 +4,89 @@
     var returnUrl = ViewData["ReturnUrl"] as string;
 }
 
-<div class="container py-5 my-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="fine-card p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <i class="bi bi-gem text-warning display-4"></i>
-                    <h2 class="text-white brand-font mt-2">Welcome Back</h2>
-                    <p class="text-muted small">Sign in to your FineDineIn account to manage reservations & orders.</p>
-                </div>
-
-                <form asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post">
-                    @Html.AntiForgeryToken()
-
-                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label text-muted small fw-semibold">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-envelope"></i></span>
-                            <input asp-for="Email" class="form-control fine-input" placeholder="e.g. customer@finedinein.com" />
+<div class="py-5" style="background-color: var(--bg-cream, #FAF7F2); min-height: 85vh; display: flex; align-items: center;">
+    <div class="container" style="max-width: 960px;">
+        
+        <!-- Main FLAVORIA Luxury Split Login Card (Matching website warm gold & dark luxury theme) -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #24201C 0%, #151311 100%);">
+            <div class="row g-0">
+                
+                <!-- Left Side: Login Form -->
+                <div class="col-lg-6 p-4 p-md-5 d-flex flex-column justify-content-between text-white">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <i class="bi bi-crown fs-4" style="color: #C59D5F;"></i>
+                            <span class="fw-bold tracking-widest text-uppercase" style="letter-spacing: 2px; font-size: 0.9rem; color: #C59D5F;">FLAVORIA</span>
                         </div>
-                        <span asp-validation-for="Email" class="text-danger small"></span>
+
+                        <!-- Welcome Back Title in White Color -->
+                        <h1 class="display-6 fw-bold mb-2 text-white font-serif">Login</h1>
+                        <p class="small mb-4 text-white-50" style="font-size: 0.88rem; line-height: 1.5;">
+                            Welcome! Please fill in your email address and password to sign into your account.
+                            Don't have an account? <a asp-action="Register" class="text-decoration-underline fw-bold" style="color: #C59D5F;">Sign Up</a>
+                        </p>
+
+                        <form asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                            <!-- Underlined Input: Email Address -->
+                            <div class="mb-4 position-relative">
+                                <div class="d-flex align-items-center border-bottom border-white-50 pb-2">
+                                    <i class="bi bi-person text-white-50 fs-5 me-3"></i>
+                                    <input asp-for="Email" class="form-control bg-transparent border-0 text-white p-0 shadow-none" 
+                                           placeholder="Email Address" required style="font-size: 0.95rem;" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Underlined Input: Password -->
+                            <div class="mb-4 position-relative">
+                                <div class="d-flex align-items-center border-bottom border-white-50 pb-2">
+                                    <i class="bi bi-lock text-white-50 fs-5 me-3"></i>
+                                    <input asp-for="Password" class="form-control bg-transparent border-0 text-white p-0 shadow-none" 
+                                           type="password" placeholder="Password" required style="font-size: 0.95rem;" />
+                                    <a asp-controller="Auth" asp-action="ForgotPassword" class="small text-white-50 text-decoration-none ms-auto" style="white-space: nowrap; font-size: 0.8rem;">
+                                        Forgot Password?
+                                    </a>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="form-check mb-0">
+                                    <input asp-for="RememberMe" class="form-check-input bg-transparent border-white-50" type="checkbox" id="rememberMe" />
+                                    <label class="form-check-label small text-white-50" for="rememberMe">Remember Me</label>
+                                </div>
+
+                                <button type="submit" class="btn rounded-pill px-4 py-2 fw-bold text-dark shadow-sm" style="min-width: 110px; background-color: #FFFFFF;">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label asp-for="Password" class="form-label text-muted small fw-semibold mb-0">Password</label>
-                            <a asp-controller="Auth" asp-action="ForgotPassword" class="small text-warning text-decoration-none">Forgot Password?</a>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-lock"></i></span>
-                            <input asp-for="Password" class="form-control fine-input" type="password" placeholder="Enter password" />
-                        </div>
-                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    <div class="pt-3 border-top border-white-10 text-white-50 small">
+                        <span>&copy; 2026 FLAVORIA Fine Dining Portal</span>
                     </div>
-
-                    <div class="form-check mb-4">
-                        <input asp-for="RememberMe" class="form-check-input bg-dark border-secondary" type="checkbox" />
-                        <label asp-for="RememberMe" class="form-check-input-label text-muted small">Remember this browser</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-gold w-100 py-2.5 mb-3">
-                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Account
-                    </button>
-                </form>
-
-                <div class="p-3 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-25 mb-3">
-                    <p class="small text-warning mb-1 fw-bold"><i class="bi bi-info-circle me-1"></i> Demo Customer Credentials:</p>
-                    <p class="small text-muted mb-0">Email: <code>customer@finedinein.com</code></p>
-                    <p class="small text-muted mb-0">Password: <code>Password123!</code></p>
                 </div>
 
-                <div class="text-center pt-2 border-top border-secondary border-opacity-25">
-                    <p class="text-muted small mb-0">
-                        Don't have an account? <a asp-controller="Auth" asp-action="Register" class="text-warning fw-semibold text-decoration-none">Create Customer Account</a>
-                    </p>
+                <!-- Right Side: Gourmet Plated Food Image -->
+                <div class="col-lg-6 d-none d-lg-block position-relative" style="background: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=700') center/cover no-repeat;">
+                    <div class="h-100 w-100" style="background: rgba(26, 24, 22, 0.25);"></div>
                 </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
+<style>
+    ::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+    .form-control:focus { background-color: transparent !important; color: #ffffff !important; box-shadow: none !important; }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

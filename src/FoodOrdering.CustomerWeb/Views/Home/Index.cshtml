@@ -124,42 +124,121 @@
 
         <!-- 8 Product Cards Grid linking to Food Detail View -->
         <div class="row g-4">
-            @{ var index = 0; }
-            @foreach (var dish in foodItems)
+            @if (foodItems != null && foodItems.Any())
             {
-                index++;
-                <div class="col-md-6 col-lg-3">
-                    <a asp-controller="Home" asp-action="Detail" asp-route-id="@dish.Id" class="text-decoration-none">
-                        <div class="product-card">
-                            <div class="product-card-img-wrapper">
-                                @if (index == 1)
-                                {
-                                    <span class="badge-ribbon">Bestseller</span>
-                                }
-                                else if (index == 2)
-                                {
-                                    <span class="badge-ribbon new">New</span>
-                                }
-                                <img src="@dish.ImageUrl" alt="@dish.Title" class="product-card-img" />
-                            </div>
-                            <div class="product-card-body">
-                                <h5 class="product-title">@dish.Title</h5>
-                                <p class="product-desc">@dish.Description</p>
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                var index = 0;
+                @foreach (var dish in foodItems)
+                {
+                    index++;
+                    <div class="col-md-6 col-lg-3">
+                        <div class="product-card h-100 d-flex flex-column">
+                            <a asp-controller="Home" asp-action="Detail" asp-route-id="@dish.Id" class="text-decoration-none">
+                                <div class="product-card-img-wrapper">
+                                    @if (index == 1)
+                                    {
+                                        <span class="badge-ribbon">Bestseller</span>
+                                    }
+                                    else if (index == 2)
+                                    {
+                                        <span class="badge-ribbon new">New</span>
+                                    }
+                                    <img src="@dish.ImageUrl" alt="@dish.Title" class="product-card-img" />
+                                </div>
+                            </a>
+                            <div class="product-card-body d-flex flex-column flex-grow-1">
+                                <a asp-controller="Home" asp-action="Detail" asp-route-id="@dish.Id" class="text-decoration-none">
+                                    <h5 class="product-title text-dark mb-1">@dish.Title</h5>
+                                    <p class="product-desc text-muted small mb-3">@dish.Description</p>
+                                </a>
+                                <div class="d-flex justify-content-between align-items-center mt-auto mb-3">
                                     <div class="product-rating">
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
                                         <span class="ms-1 text-muted">(@dish.Rating.ToString("F1"))</span>
                                     </div>
-                                    <span class="product-price">$@dish.Price.ToString("F2")</span>
+                                    <span class="product-price fw-bold text-dark">$@dish.Price.ToString("F2")</span>
                                 </div>
+
+                                <!-- Add to Cart Form Button -->
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="foodItemId" value="@dish.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="btn btn-gold btn-sm w-100 rounded-pill fw-bold py-2">
+                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                    </button>
+                                </form>
                             </div>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Fallback 8 Fine Dining Cuisine & Products -->
+                var defaultItems = new[]
+                {
+                    new { Title = "Grilled Salmon", Desc = "Served with lemon butter sauce", Price = 24.99, Rating = 4.8, Img = "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500" },
+                    new { Title = "Creamy Prawn Pasta", Desc = "Penne in creamy garlic sauce with fresh herbs", Price = 21.99, Rating = 4.7, Img = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500" },
+                    new { Title = "Ribeye Steak", Desc = "Grilled to perfection with herb butter", Price = 29.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1544025162-d76694265947?w=500" },
+                    new { Title = "Classic Tiramisu", Desc = "With cocoa & mascarpone cream", Price = 8.99, Rating = 4.6, Img = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500" },
+                    new { Title = "Truffle Mushroom Risotto", Desc = "Creamy arborio rice with black truffle", Price = 18.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=500" },
+                    new { Title = "Margherita Pizza", Desc = "Fresh basil & mozzarella on sourdough", Price = 16.99, Rating = 4.7, Img = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" },
+                    new { Title = "Mango Passion Mocktail", Desc = "Tropical refreshing artisan drink", Price = 7.99, Rating = 4.8, Img = "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500" },
+                    new { Title = "Chocolate Lava Cake", Desc = "Served warm with vanilla bean ice cream", Price = 9.99, Rating = 4.9, Img = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500" }
+                };
+
+                var idx = 0;
+                foreach (var item in defaultItems)
+                {
+                    idx++;
+                    <div class="col-md-6 col-lg-3">
+                        <div class="product-card h-100 d-flex flex-column">
+                            <a asp-controller="Home" asp-action="Detail" class="text-decoration-none">
+                                <div class="product-card-img-wrapper">
+                                    @if (idx == 1)
+                                    {
+                                        <span class="badge-ribbon">Bestseller</span>
+                                    }
+                                    else if (idx == 2)
+                                    {
+                                        <span class="badge-ribbon new">New</span>
+                                    }
+                                    <img src="@item.Img" alt="@item.Title" class="product-card-img" />
+                                </div>
+                            </a>
+                            <div class="product-card-body d-flex flex-column flex-grow-1">
+                                <a asp-controller="Home" asp-action="Detail" class="text-decoration-none">
+                                    <h5 class="product-title text-dark mb-1">@item.Title</h5>
+                                    <p class="product-desc text-muted small mb-3">@item.Desc</p>
+                                </a>
+                                <div class="d-flex justify-content-between align-items-center mt-auto mb-3">
+                                    <div class="product-rating">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <span class="ms-1 text-muted">(@item.Rating.ToString("F1"))</span>
+                                    </div>
+                                    <span class="product-price fw-bold text-dark">$@item.Price.ToString("F2")</span>
+                                </div>
+
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="foodItemId" value="@Guid.Empty" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="btn btn-gold btn-sm w-100 rounded-pill fw-bold py-2">
+                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>

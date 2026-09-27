@@ -22,6 +22,11 @@ namespace FoodOrdering.CustomerWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (!await _context.FoodCategories.AnyAsync() || !await _context.FoodItems.AnyAsync())
+            {
+                await DbSeeder.SeedAsync(_context);
+            }
+
             var categories = await _context.FoodCategories
                 .OrderBy(c => c.DisplayOrder)
                 .ToListAsync();
