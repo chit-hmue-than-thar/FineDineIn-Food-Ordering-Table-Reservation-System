@@ -1,0 +1,125 @@
+@model FoodOrdering.CustomerWeb.Models.CartViewModel
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<div class="container py-4 my-2">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="detail-main-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h3 class="brand-font fw-bold text-dark mb-0">Shopping Cart</h3>
+                    <span class="badge bg-dark text-gold fs-6">@Model.Items.Count Items</span>
+                </div>
+
+                @if (!Model.Items.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart-x text-muted display-1 mb-3"></i>
+                        <h4 class="text-dark brand-font mb-2">Your cart is empty</h4>
+                        <p class="text-muted small mb-4">Explore our luxury fine dining menu and add delicious dishes to your order.</p>
+                        <a asp-controller="Home" asp-action="Detail" class="btn btn-gold">
+                            <i class="bi bi-journal-bookmark me-2"></i> Browse Menu
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>Dish</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="@item.ImageUrl" alt="@item.Title" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover;" />
+                                                <div>
+                                                    <h6 class="fw-bold text-dark mb-0">@item.Title</h6>
+                                                    <span class="text-muted small">Dine-in Dish</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="fw-semibold">$@item.Price.ToString("F2")</td>
+                                        <td>
+                                            <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="d-flex align-items-center gap-1">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                                <button type="submit" name="quantity" value="@(item.Quantity - 1)" class="qty-btn">-</button>
+                                                <span class="fw-bold px-2">@item.Quantity</span>
+                                                <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="qty-btn">+</button>
+                                            </form>
+                                        </td>
+                                        <td class="fw-bold text-dark">$@item.Amount.ToString("F2")</td>
+                                        <td>
+                                            <form asp-controller="Cart" asp-action="Remove" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                                <button type="submit" class="btn btn-sm text-danger"><i class="bi bi-trash fs-5"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right Summary & Place Order Column -->
+        <div class="col-lg-4">
+            <div class="order-sidebar">
+                <h5 class="order-sidebar-title brand-font mb-3">Order Summary</h5>
+
+                <form asp-controller="Orders" asp-action="PlaceOrder" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark small fw-bold">Select Dine-In Table (Optional)</label>
+                        <select name="tableId" class="form-select fine-input" style="font-size: 0.85rem;">
+                            <option value="">-- Takeaway / General Dining --</option>
+                            @foreach (var table in Model.AvailableTables)
+                            {
+                                <option value="@table.Id">@table.TableNumber - @table.LocationType (Cap: @table.Capacity Diners)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark small fw-bold">Kitchen Special Instructions</label>
+                        <textarea name="notes" class="form-control fine-input" rows="2" placeholder="e.g. Medium-rare steak, extra sauce..."></textarea>
+                    </div>
+
+                    <div class="py-2 border-top border-light mb-3">
+                        <div class="d-flex justify-content-between text-muted small mb-2">
+                            <span>Subtotal</span>
+                            <span class="fw-bold text-dark">$@Model.SubTotal.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-2">
+                            <span>Promo Discount (10%)</span>
+                            <span class="fw-bold text-danger">-$@Model.DiscountAmount.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-dark fw-bold fs-5 pt-2 border-top border-light">
+                            <span>Total Payment</span>
+                            <span>$@Model.TotalAmount.ToString("F2")</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-proceed-order text-center border-0" @(Model.Items.Any() ? "" : "disabled")>
+                        <i class="bi bi-check2-circle me-2"></i> Place Dine-In Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

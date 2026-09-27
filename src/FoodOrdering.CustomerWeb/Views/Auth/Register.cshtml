@@ -1,0 +1,85 @@
+@model FoodOrdering.Domain.DTOs.RegisterDto
+@{
+    ViewData["Title"] = "Customer Registration";
+}
+
+<div class="container py-5 my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="fine-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="badge badge-gold mb-2">Join FineDineIn Club</span>
+                    <h2 class="text-white brand-font">Create Account</h2>
+                    <p class="text-muted small">Register as a customer for online ordering & dining table reservations.</p>
+                </div>
+
+                <form asp-controller="Auth" asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label text-muted small fw-semibold">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-person"></i></span>
+                            <input asp-for="Name" class="form-control fine-input" placeholder="e.g. Julian Vance" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label text-muted small fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" class="form-control fine-input" placeholder="name@domain.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Phone" class="form-label text-muted small fw-semibold">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-telephone"></i></span>
+                                <input asp-for="Phone" class="form-control fine-input" placeholder="+95 9..." />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label text-muted small fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-key"></i></span>
+                                <input asp-for="Password" class="form-control fine-input" type="password" placeholder="At least 6 characters" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label text-muted small fw-semibold">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-check2-circle"></i></span>
+                                <input asp-for="ConfirmPassword" class="form-control fine-input" type="password" placeholder="Repeat password" />
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold w-100 py-2.5 mb-3">
+                        <i class="bi bi-person-check me-2"></i> Register Account
+                    </button>
+                </form>
+
+                <div class="text-center pt-2 border-top border-secondary border-opacity-25">
+                    <p class="text-muted small mb-0">
+                        Already have a customer account? <a asp-controller="Auth" asp-action="Login" class="text-warning fw-semibold text-decoration-none">Sign In Here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

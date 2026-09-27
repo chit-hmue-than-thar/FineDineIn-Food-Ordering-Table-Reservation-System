@@ -1,0 +1,111 @@
+@model List<FoodOrdering.Domain.Entities.TblReservation>
+@{
+    ViewData["Title"] = "My Table Reservations";
+}
+
+<div class="py-5" style="background-color: var(--bg-cream); min-height: 80vh;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-gold">
+            <div>
+                <span class="text-uppercase tracking-wider text-gold font-serif text-sm fw-bold">Customer Portal</span>
+                <h2 class="display-6 font-serif fw-bold text-dark mb-0">My Table Reservations</h2>
+            </div>
+            <a asp-action="Index" class="btn btn-gold rounded-pill px-4 fw-bold">
+                <i class="bi bi-calendar-plus me-1"></i> Reserve a Table
+            </a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3 text-center" style="background-color: #d1e7dd; color: #0f5132;">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info border-0 shadow-sm mb-4 rounded-3 text-center">
+                <i class="bi bi-info-circle-fill me-2"></i> @TempData["InfoMessage"]
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 my-4 bg-white rounded-4 shadow-sm p-5">
+                <i class="bi bi-calendar-x text-gold display-1 mb-3"></i>
+                <h4 class="font-serif fw-bold text-dark mb-2">No Reservations Found</h4>
+                <p class="text-muted mb-4">You haven't reserved any dining tables yet. Reserve a luxury table for your next special occasion!</p>
+                <a asp-action="Index" class="btn btn-gold btn-lg rounded-pill px-5 fw-bold">
+                    Reserve a Table Now
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var res in Model)
+                {
+                    string statusBadgeClass = res.Status switch
+                    {
+                        FoodOrdering.Domain.Enums.ReservationStatus.Confirmed => "bg-success",
+                        FoodOrdering.Domain.Enums.ReservationStatus.Seated => "bg-primary",
+                        FoodOrdering.Domain.Enums.ReservationStatus.Completed => "bg-dark",
+                        FoodOrdering.Domain.Enums.ReservationStatus.Cancelled => "bg-danger",
+                        _ => "bg-secondary"
+                    };
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100" style="background: #ffffff;">
+                            <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                                <span class="badge px-3 py-2 rounded-pill @statusBadgeClass fw-bold">
+                                    <i class="bi bi-dot me-1"></i> @res.Status
+                                </span>
+                                <span class="text-muted small">@res.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <h4 class="font-serif fw-bold text-dark mb-1">
+                                        Table #@(res.Table?.TableNumber ?? "N/A")
+                                    </h4>
+                                    <span class="badge bg-light text-dark border px-3 py-1 rounded-pill small">
+                                        @(res.Table?.LocationType.ToString() ?? "Dining Area") Zone
+                                    </span>
+                                </div>
+
+                                <div class="p-3 mb-3 rounded-3" style="background-color: #FAF7F2;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-calendar3 text-gold me-2"></i>
+                                        <strong class="text-dark small">@res.ReservationDate.ToString("dddd, MMM dd, yyyy")</strong>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-clock text-gold me-2"></i>
+                                        <span class="text-dark small">Slot: <strong>@res.TimeSlot</strong></span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-people text-gold me-2"></i>
+                                        <span class="text-dark small">Guests: <strong>@res.PartySize People</strong></span>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(res.SpecialRequests))
+                                {
+                                    <p class="text-muted small mb-3"><i class="bi bi-chat-left-quote me-1 text-gold"></i> "@res.SpecialRequests"</p>
+                                }
+
+                                @if (res.Status == FoodOrdering.Domain.Enums.ReservationStatus.Confirmed)
+                                {
+                                    <form asp-action="Cancel" method="post" onsubmit="return confirm('Are you sure you want to cancel this table reservation?');">
+                                        <input type="hidden" name="reservationId" value="@res.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill fw-bold">
+                                            <i class="bi bi-x-circle me-1"></i> Cancel Reservation
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

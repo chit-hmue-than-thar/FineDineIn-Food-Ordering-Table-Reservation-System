@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FoodOrdering.CustomerWeb/FoodOrdering.CustomerWeb.csproj" />
+    <Project Path="src/FoodOrdering.Database/FoodOrdering.Database.csproj" />
+    <Project Path="src/FoodOrdering.Domain/FoodOrdering.Domain.csproj" />
+  </Folder>
+</Solution>

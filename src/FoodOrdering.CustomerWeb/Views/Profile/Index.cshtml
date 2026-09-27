@@ -1,0 +1,46 @@
+@model FoodOrdering.Domain.DTOs.UserProfileDto
+@{
+    ViewData["Title"] = "Customer Profile";
+}
+
+<div class="container py-5 my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="fine-card p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+                    <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center fs-2 fw-bold" style="width: 64px; height: 64px;">
+                        @Model.Name.Substring(0, 1).ToUpper()
+                    </div>
+                    <div>
+                        <span class="badge badge-gold mb-1">Customer Account</span>
+                        <h3 class="text-white brand-font mb-0">@Model.Name</h3>
+                        <p class="text-muted small mb-0">Member since @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+
+                <form asp-controller="Profile" asp-action="Update" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Email Address (Immutable)</label>
+                        <input type="text" class="form-control fine-input" value="@Model.Email" disabled readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Full Name</label>
+                        <input type="text" name="name" class="form-control fine-input" value="@Model.Name" required />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-semibold">Phone Number</label>
+                        <input type="text" name="phone" class="form-control fine-input" value="@Model.Phone" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-gold w-100">
+                        <i class="bi bi-save me-2"></i> Update Profile Information
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,175 @@
+@using FoodOrdering.Domain.Entities
+@{
+    ViewData["Title"] = "FLAVORIA - Experience Fine Dining";
+    var categories = ViewData["Categories"] as List<TblFoodCategory> ?? new List<TblFoodCategory>();
+    var foodItems = ViewData["FoodItems"] as List<TblFoodItem> ?? new List<TblFoodItem>();
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-6">
+                <span class="hero-subtitle mb-2 d-block">EXPERIENCE FINE DINING</span>
+                <h1 class="hero-title mb-3">
+                    Delicious Food,<br />Unforgettable <span>Moments</span>
+                </h1>
+                <p class="text-muted fs-6 mb-4" style="max-width: 480px; line-height: 1.6;">
+                    A perfect blend of taste, art, and ambiance.<br />Crafted to delight your senses.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="#table-reservation" class="btn btn-gold">BOOK A TABLE</a>
+                    <a href="#menu-categories" class="btn btn-outline-dark-gold">EXPLORE MENU</a>
+                </div>
+                <!-- Carousel Dots Indicator -->
+                <div class="d-flex gap-2 align-items-center opacity-75">
+                    <span class="bg-dark rounded-circle" style="width: 7px; height: 7px;"></span>
+                    <span class="bg-warning rounded-circle" style="width: 9px; height: 9px;"></span>
+                    <span class="bg-dark rounded-circle" style="width: 7px; height: 7px;"></span>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-img-container">
+                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=700" alt="Gourmet Plated Dish" class="hero-img-main img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OUR MENU CATEGORIES (6 Circle Items) -->
+<section id="menu-categories" class="py-5 bg-surface">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">OUR MENU CATEGORIES</h2>
+            <div class="section-divider">
+                <i class="bi bi-crown fs-5"></i>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            @if (categories.Any())
+            {
+                @foreach (var category in categories)
+                {
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a asp-controller="Home" asp-action="Detail" asp-route-categoryId="@category.Id" class="category-circle-wrapper">
+                            <img src="@category.ImageUrl" alt="@category.Name" class="category-circle-img" />
+                            <h5 class="category-circle-title">@category.Name</h5>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1541529086526-db283c563270?w=300" alt="Starters" class="category-circle-img" />
+                        <h5 class="category-circle-title">Starters</h5>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=300" alt="Main Course" class="category-circle-img" />
+                        <h5 class="category-circle-title">Main Course</h5>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300" alt="Desserts" class="category-circle-img" />
+                        <h5 class="category-circle-title">Desserts</h5>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300" alt="Beverages" class="category-circle-img" />
+                        <h5 class="category-circle-title">Beverages</h5>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300" alt="Pizza" class="category-circle-img" />
+                        <h5 class="category-circle-title">Pizza</h5>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Detail" class="category-circle-wrapper">
+                        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=300" alt="Chef Specials" class="category-circle-img" />
+                        <h5 class="category-circle-title">Chef Specials</h5>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CHEF'S RECOMMENDATIONS -->
+<section id="chef-recommendations" class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-4">
+            <h2 class="section-title">CHEF'S RECOMMENDATIONS</h2>
+            <div class="section-divider">
+                <i class="bi bi-crown fs-5"></i>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs mb-5">
+            <a asp-controller="Home" asp-action="Detail" class="filter-btn active">All Items</a>
+            @foreach (var cat in categories)
+            {
+                <a asp-controller="Home" asp-action="Detail" asp-route-categoryId="@cat.Id" class="filter-btn">@cat.Name</a>
+            }
+        </div>
+
+        <!-- 8 Product Cards Grid linking to Food Detail View -->
+        <div class="row g-4">
+            @{ var index = 0; }
+            @foreach (var dish in foodItems)
+            {
+                index++;
+                <div class="col-md-6 col-lg-3">
+                    <a asp-controller="Home" asp-action="Detail" asp-route-id="@dish.Id" class="text-decoration-none">
+                        <div class="product-card">
+                            <div class="product-card-img-wrapper">
+                                @if (index == 1)
+                                {
+                                    <span class="badge-ribbon">Bestseller</span>
+                                }
+                                else if (index == 2)
+                                {
+                                    <span class="badge-ribbon new">New</span>
+                                }
+                                <img src="@dish.ImageUrl" alt="@dish.Title" class="product-card-img" />
+                            </div>
+                            <div class="product-card-body">
+                                <h5 class="product-title">@dish.Title</h5>
+                                <p class="product-desc">@dish.Description</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <div class="product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <span class="ms-1 text-muted">(@dish.Rating.ToString("F1"))</span>
+                                    </div>
+                                    <span class="product-price">$@dish.Price.ToString("F2")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- SPECIAL OFFER Banner Section -->
+<section id="special-offer" class="special-offer-banner">
+    <div class="container">
+        <span class="hero-subtitle text-warning mb-2 d-block">SPECIAL OFFER</span>
+        <h2 class="special-offer-title">Get 20% Off On Your First Order</h2>
+        <a asp-controller="Home" asp-action="Detail" class="btn btn-gold">ORDER NOW</a>
+    </div>
+</section>

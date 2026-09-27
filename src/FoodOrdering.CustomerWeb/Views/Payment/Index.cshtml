@@ -1,0 +1,117 @@
+@model FoodOrdering.CustomerWeb.Models.PaymentViewModel
+@{
+    ViewData["Title"] = "Payment & Receipt Upload";
+}
+
+<div class="py-5" style="background-color: var(--bg-cream); min-height: 80vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <span class="text-uppercase tracking-wider text-gold font-serif text-sm fw-bold">Order Checkout</span>
+                    <h2 class="display-6 font-serif fw-bold text-dark mt-1">Payment Verification</h2>
+                    <p class="text-muted">Order Voucher: <strong class="text-dark">#@Model.VoucherNo</strong></p>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3 text-center" style="background-color: #d1e7dd; color: #0f5132;">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger border-0 shadow-sm mb-4 rounded-3 text-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4" style="background: #ffffff;">
+                    <div class="card-header border-0 py-4 px-4 text-white d-flex justify-content-between align-items-center" style="background: var(--primary-dark);">
+                        <div>
+                            <h5 class="mb-0 font-serif fw-bold" style="color: var(--accent-gold);">Total Amount Payable</h5>
+                            <span class="small text-muted">Dine-in Order</span>
+                        </div>
+                        <h2 class="mb-0 font-serif fw-bold" style="color: var(--accent-gold);">MMK @Model.TotalAmount.ToString("N0")</h2>
+                    </div>
+                    
+                    <div class="card-body p-4 p-md-5">
+                        <div class="row g-4 mb-4">
+                            <!-- KPay Card -->
+                            <div class="col-md-6">
+                                <div class="p-4 rounded-3 h-100 border text-center" style="background: #FAF7F2; border-color: rgba(197, 157, 95, 0.3) !important;">
+                                    <div class="mb-3">
+                                        <span class="badge px-3 py-2 text-white rounded-pill fw-bold" style="background-color: #127cc1; font-size: 0.9rem;">KBZPay</span>
+                                    </div>
+                                    <p class="text-muted mb-1 small">Account Number</p>
+                                    <h5 class="fw-bold font-serif mb-2 text-dark">@Model.KPayNumber</h5>
+                                    <p class="text-muted mb-0 small">Account Name: <strong class="text-dark">@Model.KPayAccountName</strong></p>
+                                </div>
+                            </div>
+                            <!-- WavePay Card -->
+                            <div class="col-md-6">
+                                <div class="p-4 rounded-3 h-100 border text-center" style="background: #FAF7F2; border-color: rgba(197, 157, 95, 0.3) !important;">
+                                    <div class="mb-3">
+                                        <span class="badge px-3 py-2 text-dark rounded-pill fw-bold" style="background-color: #ffe600; font-size: 0.9rem;">WavePay</span>
+                                    </div>
+                                    <p class="text-muted mb-1 small">Account Number</p>
+                                    <h5 class="fw-bold font-serif mb-2 text-dark">@Model.WavePayNumber</h5>
+                                    <p class="text-muted mb-0 small">Account Name: <strong class="text-dark">@Model.WavePayAccountName</strong></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-4">
+                            <h5 class="font-serif fw-bold mb-3 text-dark">Upload Payment Screenshot</h5>
+                            <p class="text-muted small mb-4">Please transfer the total amount via KBZPay or WavePay, take a screenshot of the transaction receipt, and upload it here for verification.</p>
+
+                            @if (!string.IsNullOrEmpty(Model.PaymentScreenshotUrl))
+                            {
+                                <div class="mb-4 text-center p-3 rounded-3 border" style="background: #FAF7F2;">
+                                    <p class="text-muted small mb-2 fw-bold">Uploaded Screenshot:</p>
+                                    <img src="@Model.PaymentScreenshotUrl" alt="Payment Receipt" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 250px; object-fit: contain;" />
+                                    <div>
+                                        <span class="badge px-3 py-2 rounded-pill bg-warning text-dark"><i class="bi bi-clock-history me-1"></i> Status: @Model.Status</span>
+                                    </div>
+                                </div>
+                            }
+
+                            <form asp-action="UploadScreenshot" asp-controller="Payment" method="post" enctype="multipart/form-data" class="mb-4">
+                                <input type="hidden" name="saleId" value="@Model.SaleId" />
+                                <div class="mb-3">
+                                    <label class="form-label font-serif fw-bold text-dark">Select Receipt File (PNG / JPG)</label>
+                                    <input type="file" name="paymentScreenshot" class="form-control form-control-lg border-gold" accept="image/*" required />
+                                </div>
+                                <button type="submit" class="btn btn-gold btn-lg w-100 fw-bold shadow-sm">
+                                    <i class="bi bi-cloud-upload me-2"></i> Submit Payment Screenshot
+                                </button>
+                            </form>
+
+                            <!-- Instant Verification / Simulation for Phase 1 -->
+                            <div class="mt-4 p-4 rounded-3 border text-center" style="background-color: #fff9e6; border-color: var(--accent-gold) !important;">
+                                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-lightning-charge-fill text-gold me-2"></i> Instant Simulated Payment Verification</h6>
+                                <p class="text-muted small mb-3">For quick testing in Phase 1, you can instantly confirm this payment to proceed to the order receipt & kitchen status.</p>
+                                <form asp-action="SimulateVerify" asp-controller="Payment" method="post">
+                                    <input type="hidden" name="saleId" value="@Model.SaleId" />
+                                    <button type="submit" class="btn btn-outline-dark fw-bold rounded-pill px-4">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i> Simulate Admin Payment Confirmation
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 py-3 text-center">
+                        <a asp-action="Detail" asp-controller="Orders" asp-route-id="@Model.SaleId" class="text-decoration-none text-muted small me-3">
+                            <i class="bi bi-bag-check me-1"></i> View Order Details
+                        </a>
+                        <a asp-action="MyOrders" asp-controller="Orders" class="text-decoration-none text-muted small">
+                            <i class="bi bi-journal-text me-1"></i> All My Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

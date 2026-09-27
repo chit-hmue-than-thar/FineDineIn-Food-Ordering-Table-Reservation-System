@@ -1,0 +1,155 @@
+@model FoodOrdering.CustomerWeb.Models.OrderTrackingViewModel
+@{
+    ViewData["Title"] = $"Order #{Model.Sale.VoucherNo} - Tracking";
+}
+
+<div class="py-5" style="background-color: var(--bg-cream); min-height: 80vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-gold">
+                    <div>
+                        <a asp-action="MyOrders" class="text-gold text-decoration-none small fw-bold mb-1 d-inline-block">
+                            <i class="bi bi-arrow-left me-1"></i> Back to My Orders
+                        </a>
+                        <h2 class="display-6 font-serif fw-bold text-dark mb-0">Order Tracking & Details</h2>
+                    </div>
+                    <div>
+                        <a asp-action="Receipt" asp-route-id="@Model.Sale.Id" class="btn btn-gold rounded-pill px-4 fw-bold">
+                            <i class="bi bi-printer me-1"></i> View Receipt
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Progress Bar Card -->
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4" style="background: #ffffff;">
+                    <div class="card-header border-0 py-3 px-4 text-white d-flex justify-content-between align-items-center" style="background: var(--primary-dark);">
+                        <div>
+                            <span class="small text-muted">Voucher No</span>
+                            <h5 class="mb-0 font-serif fw-bold" style="color: var(--accent-gold);">#@Model.Sale.VoucherNo</h5>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge px-3 py-2 rounded-pill bg-warning text-dark fw-bold">
+                                Status: @Model.Sale.Status
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="font-serif fw-bold text-dark text-center mb-4">Kitchen & Service Status</h5>
+                        
+                        <div class="progress mb-4" style="height: 12px; background-color: #FAF7F2; border-radius: 6px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                                 style="width: @(Model.ProgressPercentage)%; background-color: var(--accent-gold);" 
+                                 aria-valuenow="@Model.ProgressPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <div class="row text-center g-2">
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 20 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-cart-check display-6 d-block mb-1 @(Model.ProgressPercentage >= 20 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Placed</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 35 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-wallet2 display-6 d-block mb-1 @(Model.ProgressPercentage >= 35 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Payment</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 50 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-shield-check display-6 d-block mb-1 @(Model.ProgressPercentage >= 50 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Paid</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 70 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-fire display-6 d-block mb-1 @(Model.ProgressPercentage >= 70 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Preparing</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 85 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-bell display-6 d-block mb-1 @(Model.ProgressPercentage >= 85 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Ready</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="p-2 rounded-3 @(Model.ProgressPercentage >= 100 ? "bg-gold-subtle font-bold" : "text-muted")">
+                                    <i class="bi bi-check-circle-fill display-6 d-block mb-1 @(Model.ProgressPercentage >= 100 ? "text-gold" : "")"></i>
+                                    <span class="small d-block">Served</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.Sale.Status == FoodOrdering.Domain.Enums.SaleStatus.PaymentPending)
+                        {
+                            <div class="mt-4 alert alert-warning border-0 rounded-3 text-center p-3">
+                                <p class="mb-2 text-dark font-serif fw-bold"><i class="bi bi-exclamation-circle me-1"></i> Payment Verification Needed</p>
+                                <a asp-controller="Payment" asp-action="Index" asp-route-saleId="@Model.Sale.Id" class="btn btn-gold rounded-pill px-4 fw-bold">
+                                    Upload Receipt / Verify Payment
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Order Item Breakdown -->
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff;">
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h5 class="font-serif fw-bold text-dark mb-0">Ordered Items</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr class="text-uppercase text-muted small font-serif">
+                                        <th>Item Name</th>
+                                        <th class="text-center">Price</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Details)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold text-dark font-serif">@item.FoodName</div>
+                                            </td>
+                                            <td class="text-center">MMK @item.PricePerItem.ToString("N0")</td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-end fw-bold text-dark">MMK @item.Amount.ToString("N0")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="border-top pt-3 mt-3">
+                            <div class="row justify-content-end">
+                                <div class="col-md-5">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Subtotal:</span>
+                                        <span class="fw-bold text-dark">MMK @Model.Sale.SubTotal.ToString("N0")</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                        <span>Discount (10% Off):</span>
+                                        <span>- MMK @Model.Sale.DiscountAmount.ToString("N0")</span>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex justify-content-between font-serif fw-bold h5 text-dark">
+                                        <span>Total:</span>
+                                        <span style="color: var(--accent-gold);">MMK @Model.Sale.TotalAmount.ToString("N0")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

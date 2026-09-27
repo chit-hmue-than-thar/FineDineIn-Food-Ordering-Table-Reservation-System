@@ -1,0 +1,71 @@
+@model FoodOrdering.Domain.DTOs.LoginDto
+@{
+    ViewData["Title"] = "Sign In - Customer Portal";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<div class="container py-5 my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="fine-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-gem text-warning display-4"></i>
+                    <h2 class="text-white brand-font mt-2">Welcome Back</h2>
+                    <p class="text-muted small">Sign in to your FineDineIn account to manage reservations & orders.</p>
+                </div>
+
+                <form asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label text-muted small fw-semibold">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control fine-input" placeholder="e.g. customer@finedinein.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label asp-for="Password" class="form-label text-muted small fw-semibold mb-0">Password</label>
+                            <a asp-controller="Auth" asp-action="ForgotPassword" class="small text-warning text-decoration-none">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Password" class="form-control fine-input" type="password" placeholder="Enter password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="RememberMe" class="form-check-input bg-dark border-secondary" type="checkbox" />
+                        <label asp-for="RememberMe" class="form-check-input-label text-muted small">Remember this browser</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold w-100 py-2.5 mb-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Account
+                    </button>
+                </form>
+
+                <div class="p-3 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-25 mb-3">
+                    <p class="small text-warning mb-1 fw-bold"><i class="bi bi-info-circle me-1"></i> Demo Customer Credentials:</p>
+                    <p class="small text-muted mb-0">Email: <code>customer@finedinein.com</code></p>
+                    <p class="small text-muted mb-0">Password: <code>Password123!</code></p>
+                </div>
+
+                <div class="text-center pt-2 border-top border-secondary border-opacity-25">
+                    <p class="text-muted small mb-0">
+                        Don't have an account? <a asp-controller="Auth" asp-action="Register" class="text-warning fw-semibold text-decoration-none">Create Customer Account</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

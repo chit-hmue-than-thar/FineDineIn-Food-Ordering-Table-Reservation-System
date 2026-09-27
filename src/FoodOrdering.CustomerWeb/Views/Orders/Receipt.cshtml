@@ -1,0 +1,115 @@
+@model FoodOrdering.Domain.Entities.TblSale
+@{
+    ViewData["Title"] = $"Receipt - {Model.VoucherNo}";
+}
+
+<div class="py-5" style="background-color: var(--bg-cream); min-height: 85vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+                    <a asp-action="MyOrders" class="btn btn-outline-dark rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> My Orders
+                    </a>
+                    <button onclick="window.print()" class="btn btn-gold rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-printer-fill me-1"></i> Print Receipt
+                    </button>
+                </div>
+
+                <!-- Printable Receipt Box -->
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden p-4 p-md-5" style="background: #ffffff;" id="receiptContent">
+                    <!-- Brand Header -->
+                    <div class="text-center pb-4 mb-4 border-bottom border-gold">
+                        <h2 class="display-6 font-serif fw-bold text-dark mb-1" style="letter-spacing: 2px;">FLAVORIA</h2>
+                        <span class="text-uppercase tracking-wider text-gold font-serif text-sm fw-bold">Fine Dining & Lounge</span>
+                        <p class="text-muted small mb-0 mt-2">No. 124, Luxury Avenue, Bahan Township, Yangon</p>
+                        <p class="text-muted small mb-0">Tel: +95 9 791234567 | Email: info@finedinein.com</p>
+                    </div>
+
+                    <!-- Receipt Metadata -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Voucher Number:</span>
+                            <strong class="font-serif text-dark h5">#@Model.VoucherNo</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span class="text-muted small d-block">Date & Time:</span>
+                            <strong class="text-dark small">@Model.CreatedAt.ToString("MMM dd, yyyy - hh:mm tt")</strong>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 p-3 rounded-3" style="background-color: #FAF7F2;">
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Customer:</span>
+                            <strong class="text-dark">@(Model.User?.Name ?? "Guest Customer")</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span class="text-muted small d-block">Service Type:</span>
+                            <strong class="text-dark">Dine-In @(Model.Table != null ? $"(Table #{Model.Table.TableNumber})" : "")</strong>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <table class="table table-borderless align-middle mb-4">
+                        <thead>
+                            <tr class="border-bottom text-uppercase text-muted small font-serif">
+                                <th>Item</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Price</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SaleDetails)
+                            {
+                                <tr class="border-bottom border-light">
+                                    <td class="fw-bold font-serif text-dark py-3">@item.FoodName</td>
+                                    <td class="text-center py-3">@item.Quantity</td>
+                                    <td class="text-end py-3">MMK @item.PricePerItem.ToString("N0")</td>
+                                    <td class="text-end fw-bold text-dark py-3">MMK @item.Amount.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <!-- Summary -->
+                    <div class="row justify-content-end mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal:</span>
+                                <span>MMK @Model.SubTotal.ToString("N0")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Promo Discount (10%):</span>
+                                <span>- MMK @Model.DiscountAmount.ToString("N0")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Service Fee:</span>
+                                <span>MMK 0</span>
+                            </div>
+                            <hr class="my-2 border-gold" />
+                            <div class="d-flex justify-content-between font-serif fw-bold h4 text-dark mb-0">
+                                <span>Total Paid:</span>
+                                <span style="color: var(--accent-gold);">MMK @Model.TotalAmount.ToString("N0")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Status -->
+                    <div class="p-3 rounded-3 text-center border" style="background-color: #FAF7F2; border-color: rgba(197, 157, 95, 0.3) !important;">
+                        <span class="text-muted small d-block mb-1">Payment Method & Status</span>
+                        <strong class="text-dark font-serif h6 mb-0">KBZPay / WavePay — <span class="text-success fw-bold">@Model.Status</span></strong>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="text-center mt-4 pt-3 border-top text-muted small font-serif">
+                        <p class="mb-1">A perfect blend of taste, art, and ambiance.</p>
+                        <p class="mb-0">Thank you for dining with FLAVORIA Fine Dining!</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

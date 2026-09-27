@@ -1,0 +1,275 @@
+@model FoodOrdering.CustomerWeb.Models.FoodDetailViewModel
+@{
+    ViewData["Title"] = Model.FoodItem.Title + " - Food Detail & Menu";
+}
+
+<div class="container py-4 my-2">
+    <div class="row g-4">
+        
+        <!-- LEFT COLUMN (8 Cols): Category Filters + Food Detail Card + Recommended Carousel -->
+        <div class="col-lg-8">
+
+            <!-- Category Filter Pills matching reference image -->
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div class="filter-tabs">
+                    <a asp-controller="Catalog" asp-action="Index" class="filter-btn @(Model.SelectedCategoryName == "All" ? "active" : "")">All</a>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <a asp-controller="Catalog" asp-action="Index" asp-route-categoryId="@cat.Id" class="filter-btn @(Model.SelectedCategoryName == cat.Name ? "active" : "")">@cat.Name</a>
+                    }
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <form asp-controller="Catalog" asp-action="Index" method="get" class="d-flex gap-2">
+                        <input type="text" name="search" class="form-control form-control-sm rounded-pill border-0 shadow-sm px-3" placeholder="Search..." style="background: #FFFFFF; font-size: 0.82rem;" />
+                    </form>
+                </div>
+            </div>
+
+            <!-- MAIN FOOD DETAIL CARD (Matching reference image) -->
+            <div class="detail-main-card">
+                <div class="row align-items-center gy-4">
+                    
+                    <!-- Left: Large Circular Dish Photo -->
+                    <div class="col-md-5 text-center">
+                        <div class="detail-dish-container">
+                            <img src="@Model.FoodItem.ImageUrl" id="mainDishImg" alt="@Model.FoodItem.Title" class="detail-dish-img img-fluid" />
+                        </div>
+                    </div>
+
+                    <!-- Right: Dish Specifications & Size / Ingredients -->
+                    <div class="col-md-7">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Category: <strong class="text-dark">@(Model.FoodItem.Category?.Name ?? "Main Course")</strong></span>
+                            <span class="prep-time-badge" id="mainPrepTime">
+                                <i class="bi bi-clock me-1 text-warning"></i> @Model.FoodItem.EstimatedPrepTimeMinutes min
+                            </span>
+                        </div>
+
+                        <h2 class="brand-font fw-bold text-dark mb-2" id="mainTitle">@Model.FoodItem.Title</h2>
+                        <p class="text-muted small mb-4" id="mainDesc">@Model.FoodItem.Description</p>
+
+                        <!-- Size / Portion Options -->
+                        <div class="mb-4">
+                            <label class="form-label text-dark small fw-bold mb-2">Size / Portion</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="size-pill-option active" onclick="selectSize(this)">Standard (500g)</button>
+                                <button type="button" class="size-pill-option" onclick="selectSize(this)">Half (350g)</button>
+                                <button type="button" class="size-pill-option" onclick="selectSize(this)">Chef Tasting (750g)</button>
+                            </div>
+                        </div>
+
+                        <!-- Main Ingredients / Extras Cards -->
+                        <div class="mb-4">
+                            <label class="form-label text-dark small fw-bold mb-2">Main Ingredients & Extras</label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                @if (Model.ParsedIngredients.Any())
+                                {
+                                    @foreach (var ing in Model.ParsedIngredients)
+                                    {
+                                        <div class="ingredient-card">
+                                            <span class="small fw-semibold text-dark">@ing</span>
+                                            <div class="ingredient-check"><i class="bi bi-check"></i></div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="ingredient-card">
+                                        <span class="small fw-semibold text-dark">Herb Butter</span>
+                                        <div class="ingredient-check"><i class="bi bi-check"></i></div>
+                                    </div>
+                                    <div class="ingredient-card">
+                                        <span class="small fw-semibold text-dark">Garlic Sauce</span>
+                                        <div class="ingredient-check"><i class="bi bi-check"></i></div>
+                                    </div>
+                                    <div class="ingredient-card">
+                                        <span class="small fw-semibold text-dark">Parmesan</span>
+                                        <div class="ingredient-check"><i class="bi bi-check"></i></div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Price and Add to Cart Button -->
+                        <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light">
+                            <div>
+                                <span class="text-muted small d-block">Total Amount</span>
+                                <span class="fs-3 fw-bold text-dark" id="mainPrice">$@Model.FoodItem.Price.ToString("F2")</span>
+                            </div>
+                            <button type="button" class="btn btn-gold px-4 py-2" onclick="addToOrderSidebar('@Model.FoodItem.Title', '@Model.FoodItem.ImageUrl', @Model.FoodItem.Price, '@Model.FoodItem.Id')">
+                                <i class="bi bi-bag-plus me-2"></i> Add to cart
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECOMMENDED DISHES HORIZONTAL CAROUSEL -->
+            <div>
+                <h5 class="brand-font fw-bold text-dark mb-3">Recommended Dishes</h5>
+                <div class="row g-3">
+                    @foreach (var rec in Model.RecommendedItems)
+                    {
+                        <div class="col-md-4">
+                            <div class="product-card p-3">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <img src="@rec.ImageUrl" alt="@rec.Title" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover;" />
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <h6 class="fw-bold text-dark mb-0 text-truncate">@rec.Title</h6>
+                                        <span class="text-muted small">@(rec.Category?.Name ?? "Fine Dining")</span>
+                                    </div>
+                                    <button class="btn btn-sm text-muted p-0" title="Wishlist"><i class="bi bi-heart"></i></button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-light">
+                                    <span class="fw-bold text-dark">$@rec.Price.ToString("F2")</span>
+                                    <a asp-controller="Catalog" asp-action="Detail" asp-route-id="@rec.Id" class="btn btn-sm btn-gold p-1 px-2">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDEBAR (4 Cols): My Order Summary matching reference image -->
+        <div class="col-lg-4">
+            <div class="order-sidebar">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="order-sidebar-title brand-font mb-0">My Order</h5>
+                    <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0" onclick="clearCart()">Delete All</button>
+                </div>
+
+                <!-- Order Items List Container -->
+                <div id="cartItemsList">
+                    <!-- Item 1: Grilled Salmon / Current Food -->
+                    <div class="order-item-card d-flex align-items-center justify-content-between" id="cartItem-1">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="@Model.FoodItem.ImageUrl" class="order-item-card-img order-item-img" alt="Item" />
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0 fs-6">@Model.FoodItem.Title</h6>
+                                <span class="text-muted small d-block">Standard Portion</span>
+                                <span class="fw-bold text-dark small">$@Model.FoodItem.Price.ToString("F2")</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="qty-stepper">
+                                <button type="button" class="qty-btn" onclick="updateQty(this, -1)">-</button>
+                                <span class="fw-bold small qty-val">1</span>
+                                <button type="button" class="qty-btn" onclick="updateQty(this, 1)">+</button>
+                            </div>
+                            <button type="button" class="btn btn-sm text-muted p-1" onclick="removeItem(this)"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discount Promo Voucher Box -->
+                <div class="p-3 bg-light rounded-3 my-3 border border-light d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-percent text-warning fs-5"></i>
+                        <span class="small fw-semibold text-dark">Discount Promo</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-dark-gold py-1 px-2" style="font-size: 0.72rem;">Change Promo</button>
+                </div>
+
+                <!-- Financial Summary -->
+                <div class="py-2 border-top border-light mb-3">
+                    <div class="d-flex justify-content-between text-muted small mb-2">
+                        <span>Total Product Price</span>
+                        <span class="fw-bold text-dark" id="subtotalPrice">$@Model.FoodItem.Price.ToString("F2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted small mb-2">
+                        <span>Discount (10% Promo)</span>
+                        <span class="fw-bold text-danger" id="discountPrice">-$@((Model.FoodItem.Price * 0.10m).ToString("F2"))</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-dark fw-bold fs-5 pt-2 border-top border-light">
+                        <span>Total Payment</span>
+                        <span id="finalPaymentPrice">$@((Model.FoodItem.Price * 0.90m).ToString("F2"))</span>
+                    </div>
+                </div>
+
+                <!-- Proceed to Order CTA Button -->
+                <a href="#place-order" class="btn-proceed-order text-center text-decoration-none d-block">
+                    Proceed to Order <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function selectSize(btn) {
+            document.querySelectorAll('.size-pill-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function updateQty(btn, change) {
+            var qtySpan = btn.parentElement.querySelector('.qty-val');
+            var currentQty = parseInt(qtySpan.innerText) || 1;
+            var newQty = currentQty + change;
+            if (newQty < 1) return;
+            qtySpan.innerText = newQty;
+            recalculateTotals();
+        }
+
+        function removeItem(btn) {
+            var itemCard = btn.closest('.order-item-card');
+            if (itemCard) {
+                itemCard.remove();
+                recalculateTotals();
+            }
+        }
+
+        function clearCart() {
+            document.getElementById('cartItemsList').innerHTML = '<p class="text-muted small text-center py-3">No items in your order.</p>';
+            recalculateTotals();
+        }
+
+        function addToOrderSidebar(title, img, price, id) {
+            var list = document.getElementById('cartItemsList');
+            var newItemHtml = `
+                <div class="order-item-card d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="${img}" class="order-item-img" alt="Item" />
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 fs-6">${title}</h6>
+                            <span class="text-muted small d-block">Standard Portion</span>
+                            <span class="fw-bold text-dark small">$${price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="qty-stepper">
+                            <button type="button" class="qty-btn" onclick="updateQty(this, -1)">-</button>
+                            <span class="fw-bold small qty-val">1</span>
+                            <button type="button" class="qty-btn" onclick="updateQty(this, 1)">+</button>
+                        </div>
+                        <button type="button" class="btn btn-sm text-muted p-1" onclick="removeItem(this)"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>`;
+            list.insertAdjacentHTML('beforeend', newItemHtml);
+            recalculateTotals();
+        }
+
+        function recalculateTotals() {
+            var items = document.querySelectorAll('.order-item-card');
+            var subtotal = 0;
+            items.forEach(function(item) {
+                var priceText = item.querySelector('.fw-bold.text-dark.small').innerText.replace('$', '');
+                var qty = parseInt(item.querySelector('.qty-val').innerText) || 1;
+                subtotal += parseFloat(priceText) * qty;
+            });
+
+            var discount = subtotal * 0.10;
+            var total = subtotal - discount;
+
+            document.getElementById('subtotalPrice').innerText = '$' + subtotal.toFixed(2);
+            document.getElementById('discountPrice').innerText = '-$' + discount.toFixed(2);
+            document.getElementById('finalPaymentPrice').innerText = '$' + total.toFixed(2);
+        }
+    </script>
+}

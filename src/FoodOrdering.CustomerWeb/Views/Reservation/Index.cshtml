@@ -1,0 +1,209 @@
+@model FoodOrdering.CustomerWeb.Models.SeatMapViewModel
+@{
+    ViewData["Title"] = "Dine-in Table Reservation";
+}
+
+<div class="py-5" style="background-color: var(--bg-cream); min-height: 85vh;">
+    <div class="container">
+        
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <span class="text-uppercase tracking-wider text-gold font-serif text-sm fw-bold">Exclusive Fine Dining</span>
+            <h1 class="display-5 font-serif fw-bold text-dark mt-1">Reserve Your Table</h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Experience unmatched culinary elegance and atmospheric luxury. Select your preferred date, time slot, and table.
+            </p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger border-0 shadow-sm mb-4 rounded-3 text-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Filter & Date Slot Selector -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5" style="background: #ffffff;">
+            <div class="card-body p-4 p-md-5">
+                <form method="get" asp-action="Index" asp-controller="Reservation" class="row g-3 align-items-end">
+                    
+                    <div class="col-md-3">
+                        <label class="form-label font-serif fw-bold text-dark">Reservation Date</label>
+                        <input type="date" name="date" class="form-control form-control-lg border-gold" 
+                               value="@Model.SelectedDate.ToString("yyyy-MM-dd")" 
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label font-serif fw-bold text-dark">Time Slot</label>
+                        <select name="timeSlot" class="form-select form-select-lg border-gold">
+                            <option value="12:00 - 14:00" selected="@(Model.SelectedTimeSlot == "12:00 - 14:00")">12:00 PM - 02:00 PM (Lunch)</option>
+                            <option value="18:00 - 20:00" selected="@(Model.SelectedTimeSlot == "18:00 - 20:00")">06:00 PM - 08:00 PM (Dinner Slot 1)</option>
+                            <option value="20:00 - 22:00" selected="@(Model.SelectedTimeSlot == "20:00 - 22:00")">08:00 PM - 10:00 PM (Dinner Slot 2)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label font-serif fw-bold text-dark">Guests</label>
+                        <select name="partySize" class="form-select form-select-lg border-gold">
+                            @for (int i = 1; i <= 10; i++)
+                            {
+                                <option value="@i" selected="@(Model.PartySize == i)">@i @(i == 1 ? "Guest" : "Guests")</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label font-serif fw-bold text-dark">Zone / Section</label>
+                        <select name="location" class="form-select form-select-lg border-gold">
+                            <option value="">All Zones</option>
+                            <option value="Indoor" selected="@(Model.LocationFilter == FoodOrdering.Domain.Enums.TableLocationType.Indoor)">Indoor Dining</option>
+                            <option value="Outdoor" selected="@(Model.LocationFilter == FoodOrdering.Domain.Enums.TableLocationType.Outdoor)">Outdoor Garden</option>
+                            <option value="VIPBooth" selected="@(Model.LocationFilter == FoodOrdering.Domain.Enums.TableLocationType.VIPBooth)">Private VIP Booth</option>
+                            <option value="Terrace" selected="@(Model.LocationFilter == FoodOrdering.Domain.Enums.TableLocationType.Terrace)">Rooftop Terrace</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-gold btn-lg w-100 fw-bold shadow-sm">
+                            <i class="bi bi-search me-1"></i> Check Seats
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Visual Seat Map Legend & Overview -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h4 class="font-serif fw-bold text-dark mb-0">
+                    Interactive Table Map 
+                    <span class="text-muted fs-6 font-sans ms-2">(@Model.SelectedDate.ToString("ddd, MMM dd, yyyy") | @Model.SelectedTimeSlot)</span>
+                </h4>
+            </div>
+            <div class="d-flex align-items-center gap-4 bg-white px-4 py-2 rounded-pill shadow-sm">
+                <div class="d-flex align-items-center">
+                    <span class="badge rounded-circle p-2 bg-success me-2"> </span>
+                    <span class="small fw-bold text-dark">Available Table</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge rounded-circle p-2 bg-danger me-2"> </span>
+                    <span class="small fw-bold text-muted">Already Reserved</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Map Cards Grid -->
+        <div class="row g-4 mb-5">
+            @if (Model.Tables == null || !Model.Tables.Any())
+            {
+                <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm">
+                    <p class="text-muted mb-0">No tables match your filter criteria. Try adjusting the date or zone.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var table in Model.Tables)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 text-center overflow-hidden transition-hover p-4" 
+                             style="background: #ffffff; border-top: 4px solid @(table.IsAvailableForSlot ? "var(--accent-gold)" : "#dc3545") !important;">
+                            
+                            <div class="mb-3">
+                                <span class="badge rounded-pill px-3 py-2 fw-bold @(table.IsAvailableForSlot ? "bg-success" : "bg-danger")">
+                                    @(table.IsAvailableForSlot ? "🟢 AVAILABLE" : "🔴 RESERVED")
+                                </span>
+                            </div>
+
+                            <div class="mb-2">
+                                <i class="bi bi-headset-vr display-4 text-gold mb-2 d-inline-block" style="color: var(--accent-gold);"></i>
+                                <h3 class="font-serif fw-bold text-dark mb-0">Table #@table.TableNumber</h3>
+                            </div>
+
+                            <p class="text-muted small mb-2">Zone: <strong class="text-dark">@table.LocationType</strong></p>
+                            <p class="text-muted small mb-3"><i class="bi bi-people-fill me-1"></i> Capacity: <strong>@table.Capacity Guests</strong></p>
+                            
+                            @if (!string.IsNullOrEmpty(table.Description))
+                            {
+                                <p class="text-muted small italic mb-4" style="font-size: 0.85rem;">"@table.Description"</p>
+                            }
+
+                            <div class="mt-auto">
+                                @if (table.IsAvailableForSlot)
+                                {
+                                    <button type="button" class="btn btn-gold w-100 rounded-pill fw-bold shadow-sm" 
+                                            data-bs-toggle="modal" data-bs-target="#bookModal-@table.TableId">
+                                        <i class="bi bi-calendar-check me-1"></i> Book Table
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button disabled class="btn btn-secondary w-100 rounded-pill fw-bold opacity-50">
+                                        Occupied
+                                    </button>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Modal for Booking Table -->
+                    @if (table.IsAvailableForSlot)
+                    {
+                        <div class="modal fade" id="bookModal-@table.TableId" tabindex="-1" aria-labelledby="bookModalLabel-@table.TableId" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 rounded-4 shadow-lg" style="background: #ffffff;">
+                                    <div class="modal-header border-0 text-white" style="background: var(--primary-dark);">
+                                        <h5 class="modal-title font-serif fw-bold" style="color: var(--accent-gold);">Confirm Table #@table.TableNumber Reservation</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form asp-action="Book" asp-controller="Reservation" method="post">
+                                        <input type="hidden" name="tableId" value="@table.TableId" />
+                                        <input type="hidden" name="reservationDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                                        <input type="hidden" name="timeSlot" value="@Model.SelectedTimeSlot" />
+
+                                        <div class="modal-body p-4">
+                                            <div class="p-3 mb-4 rounded-3 text-center" style="background: #FAF7F2;">
+                                                <h6 class="font-serif fw-bold text-dark mb-1">Table #@table.TableNumber (@table.LocationType Zone)</h6>
+                                                <p class="text-muted small mb-0">Date: <strong>@Model.SelectedDate.ToString("MMM dd, yyyy")</strong> | Slot: <strong>@Model.SelectedTimeSlot</strong></p>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label font-serif fw-bold text-dark">Number of Guests</label>
+                                                <input type="number" name="partySize" class="form-control form-control-lg border-gold" 
+                                                       value="@Model.PartySize" min="1" max="@table.Capacity" required />
+                                                <div class="form-text">Maximum capacity for this table is @table.Capacity guests.</div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label font-serif fw-bold text-dark">Special Requests / Occasion (Optional)</label>
+                                                <textarea name="specialRequests" class="form-control border-gold" rows="3" 
+                                                          placeholder="e.g. Anniversary celebration, quiet corner preferred, high chair needed..."></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer border-0 p-4 pt-0">
+                                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-gold rounded-pill px-5 fw-bold shadow-sm">
+                                                Confirm Booking
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+
+        <!-- Quick link to user reservations -->
+        <div class="text-center pt-3">
+            <a asp-action="MyReservations" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold">
+                <i class="bi bi-journal-check me-2"></i> View My Table Reservations
+            </a>
+        </div>
+
+    </div>
+</div>
